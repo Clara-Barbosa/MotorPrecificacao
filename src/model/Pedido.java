@@ -1,36 +1,38 @@
 package model;
 
 public class Pedido {
-
-    private double distancia;
-    private boolean chuva;
+    private double distanciaKm;
+    private int tempoMinutos;
+    private boolean estaChovendo;
     private boolean horarioPico;
-    private String tipoCorrida;
+    private TipoCategoria tipoCategoria;
 
-    public Pedido(double distancia,
-                  boolean chuva,
+    public Pedido(double distanciaKm,
+                  int tempoMinutos,
+                  boolean estaChovendo,
                   boolean horarioPico,
-                  String tipoCorrida) {
+                  TipoCategoria tipoCategoria) {
 
-        this.distancia = distancia;
-        this.chuva = chuva;
+        this.distanciaKm = distanciaKm;
+        this.tempoMinutos = tempoMinutos;
+        this.estaChovendo = estaChovendo;
         this.horarioPico = horarioPico;
-        this.tipoCorrida = tipoCorrida;
+        this.tipoCategoria = tipoCategoria;
     }
 
-    public double getDistancia() {
-        return distancia;
+    public double getDistanciaKm() {
+        return distanciaKm;
     }
 
-    public boolean isChuva() {
-        return chuva;
+    public boolean isEstaChovendo() {
+        return estaChovendo;
     }
 
     public boolean isHorarioPico() {
         return horarioPico;
     }
 
-    public String getTipoCorrida() {
-        return tipoCorrida;
+    public TipoCategoria getTipoCategoria() {
+        return tipoCategoria;
     }
 }
