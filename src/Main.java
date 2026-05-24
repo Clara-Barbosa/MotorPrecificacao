@@ -1,20 +1,28 @@
-import decorator.*;
+import builder.PedidoBuilder;
+import model.Pedido;
+import model.TipoCategoria;
+import service.CalculadoraController;
 
 public class Main {
 
     public static void main(String[] args) {
 
-        Tarifa tarifa =
-                new TarifaBase(20);
+        System.out.println("-- Testando o Motor de Precificação --");
 
-        tarifa =
-                new ChuvaDecorator(tarifa);
+        // Builder
+        Pedido meuPedido = new PedidoBuilder()
+                .comDistancia(10.0) // 10 km
+                .comTempo(20)       // 20 minutos
+                .comTipoCategoria(TipoCategoria.LUXO) // Categoria Luxo
+                .comChuva(true)     // Com chuva
+                .noHorarioPico(true) // horário de pico
+                .build();
 
-        tarifa =
-                new PicoDecorator(tarifa);
+        // controller
+        CalculadoraController controller = new CalculadoraController();
+        double precoFinal = controller.processarCorrida(meuPedido);
 
-        System.out.println(
-                tarifa.calcular()
-        );
+        // resultado
+        System.out.println("Preço final da corrida: R$ " + precoFinal);
     }
 }
