@@ -39,8 +39,5 @@ public class PedidoBuilder {
         return new Pedido (distanciaKm, tempoMinutos,
                 estaChovendo, horarioPico, tipoCategoria);
     }
-    
-    public int getTempoMinutos() {
-        return tempoMinutos;
-    }
-}
+
+

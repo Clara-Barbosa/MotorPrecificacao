@@ -35,4 +35,8 @@ public class Pedido {
     public TipoCategoria getTipoCategoria() {
         return tipoCategoria;
     }
+    
+        public int getTempoMinutos() {
+        return tempoMinutos;
+    }
 }
