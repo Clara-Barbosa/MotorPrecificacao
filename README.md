@@ -1,6 +1,6 @@
 # 🚗 Motor de Precificação Dinâmica
 
-Projeto desenvolvido para a disciplina de **Arquitetura e Projeto de Software (APS)**, com foco na aplicação de **padrões de projeto GoF**, **princípios SOLID**, **GRASP**, **arquitetura em camadas** e **testes automatizados com JUnit**.
+Projeto desenvolvido para a disciplina de **Análise e Projeto de Software (APS)**, com foco na aplicação de **padrões de projeto GoF**, **princípios SOLID**, **GRASP**, **arquitetura em camadas** e **testes automatizados com JUnit**.
 
 ---
 
