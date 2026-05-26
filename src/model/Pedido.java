@@ -1,11 +1,11 @@
 package model;
 
 public class Pedido {
-    private double distanciaKm;
-    private int tempoMinutos;
-    private boolean estaChovendo;
-    private boolean horarioPico;
-    private TipoCategoria tipoCategoria;
+    private final double distanciaKm;
+    private final int tempoMinutos;
+    private final boolean estaChovendo;
+    private final boolean horarioPico;
+    private final TipoCategoria tipoCategoria;
 
     public Pedido(double distanciaKm,
                   int tempoMinutos,
@@ -37,11 +37,6 @@ public class Pedido {
     }
     
         public int getTempoMinutos() {
-        return tempoMinutos;
-    }
-}
-
-    public int getTempoMinutos() {
         return tempoMinutos;
     }
 }
