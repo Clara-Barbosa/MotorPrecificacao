@@ -40,3 +40,8 @@ public class Pedido {
         return tempoMinutos;
     }
 }
+
+    public int getTempoMinutos() {
+        return tempoMinutos;
+    }
+}
