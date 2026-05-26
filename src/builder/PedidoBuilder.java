@@ -40,3 +40,4 @@ public class PedidoBuilder {
                 estaChovendo, horarioPico, tipoCategoria);
     }
 }
+
