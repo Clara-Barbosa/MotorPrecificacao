@@ -1,232 +1,130 @@
 # 🚗 Motor de Precificação Dinâmica
 
-Projeto desenvolvido para a disciplina de **Análise e Projeto de Software (APS)**, com foco na aplicação de **padrões de projeto GoF**, **princípios SOLID**, **GRASP**, **arquitetura em camadas** e **testes automatizados com JUnit**.
+Projeto desenvolvido para a disciplina de **Análise e Projeto de Software (APS)**, com foco na aplicação de **padrões de projeto GoF**, **princípios SOLID**, **GRASP**, **arquitetura em camadas** e **testes automatizados com JUnit 5**.
 
 ---
 
 ## 📌 Objetivo
 
-O projeto simula um **motor de precificação dinâmica de corridas**, semelhante a aplicativos de mobilidade (ex: Uber), onde o valor final da corrida pode variar de acordo com fatores externos, como:
+O projeto simula um **motor de precificação dinâmica de corridas**, semelhante a aplicativos de mobilidade (ex: Uber), onde o valor final da tarifa pode variar de acordo com fatores contextuais em tempo real, como:
 
+- 🛣️ Distância percorrida e tempo
+- 🚘 Categoria do veículo (Popular ou Luxo)
 - 🌧️ Condição climática (chuva)
-- 🚦 Horário de pico
-- 🚘 Tipo de tarifa
+- 🚦 Demanda (horário de pico)
 
-O sistema foi desenvolvido visando **baixo acoplamento**, **alta coesão**, **facilidade de manutenção** e **escalabilidade**, seguindo boas práticas de Engenharia de Software.
-
----
-
-## 🏛 Arquitetura
-
-O sistema segue o padrão de **Arquitetura em Camadas (Layered Architecture)**:
-
-```text
-Controller
-    ↓
-Service / Domain
-    ↓
-Model / Decorators
-```
-
-### Camadas
-
-- **Controller** → responsável por receber requisições e controlar o fluxo da aplicação.
-- **Service/Domain** → responsável pelas regras de negócio e cálculos.
-- **Model** → representação das entidades do domínio.
-- **Decorator** → aplicação dinâmica de regras de precificação.
+O maior desafio resolvido por esta arquitetura foi evitar que o acúmulo de regras tarifárias resultasse em um código rígido, acoplado e de alta complexidade ciclomática (caracterizado por longas cadeias de `if/else`).
 
 ---
 
 ## 🧩 Padrões de Projeto Aplicados (GoF)
 
-### 1. Structural Pattern — Decorator
+Para garantir flexibilidade e manutenibilidade, o sistema foi estruturado com três padrões fundamentais:
 
-O padrão **Decorator** foi utilizado para adicionar regras de precificação dinamicamente, sem alterar o código existente.
+### 1. Creational Pattern — Builder
+Utilizado (`PedidoBuilder`) para encapsular a construção complexa de um `Pedido`, evitando construtores longos e garantindo que o objeto de domínio seja instanciado apenas em um estado consistente.
 
-### Decorators implementados:
+### 2. Behavioral Pattern — Strategy
+Aplicado (`EstrategiaPrecificacao`, `CalculoPopular`, `CalculoLuxo`) para isolar a regra de cálculo da tarifa base dependendo da categoria do veículo. Permite adicionar novas categorias no futuro sem alterar o motor principal.
 
-- `ChuvaDecorator`
-- `PicoDecorator`
+### 3. Structural Pattern — Decorator
+Utilizado (`TarifaDecorator`, `ChuvaDecorator`, `PicoDecorator`) para adicionar taxas dinâmicas e cumulativas ao preço base em tempo de execução, eliminando a necessidade de múltiplas subclasses ou blocos condicionais.
 
-Exemplo de composição:
+---
+
+## Diagramas UML do projeto
+
+**Diagrama de Pacotes:**
+![Diagrama de Pacotes](img/diagrama-pacotes.jpeg)
+
+**Diagrama de Classes:**
+![Diagrama de Classes](img/diagrama-classes.jpeg)
+
+**Diagramas de Sequência:**
+![Criação do Pedido](img/diagrama-sequencia-pedido.jpeg)
+![Cálculo da Tarifa](img/diagrama-sequencia-tarifa.jpeg)
+
+---
+
+## 📊 Métricas e Qualidade de Código (Análise Estática)
+
+A eficácia da refatoração e da aplicação dos padrões foi validada por ferramentas de análise estática (*MetricsReloaded*), comprovando a eliminação de *code smells*:
+
+- **Complexidade Ciclomática:** Reduzida de $CC = 3$ (no código legado `CalculadoraSemPadrao`) para **$CC = 1$** nas classes refatoradas (Decorators e Strategies).
+- **Acoplamento Aferente ($C_a = 6$):** A interface principal (`Tarifa`) possui alto índice de componentes dependentes, provando a estabilidade da abstração.
+- **Acoplamento Eferente ($C_e = 2$):** As classes de estratégia desconhecem os modificadores de preço, garantindo altíssima coesão e modularidade.
+
+---
+
+## ⚙️ Princípios SOLID e GRASP Aplicados
+
+- **SRP (Responsabilidade Única):** Cada decorador isola um cálculo matemático específico.
+- **OCP (Aberto/Fechado):** O sistema está aberto para receber uma nova taxa (ex: `FeriadoDecorator`) sem que o motor principal precise ser modificado.
+- **DIP (Inversão de Dependência):** O sistema depende de abstrações (`Tarifa` e `EstrategiaPrecificacao`) em vez de implementações concretas.
+- **Information Expert (GRASP):** A classe `Pedido` concentra todos os dados necessários da corrida em um estado imutável (`final`).
+- **Controller (GRASP):** A classe `CalculadoraController` orquestra o fluxo sem absorver o peso das operações matemáticas.
+
+---
+
+## 🧪 Testes Automatizados (TDD)
+
+O projeto utiliza **JUnit 5** para assegurar a confiabilidade das transformações matemáticas.
+
+### Cenários validados:
+✅ Injeção estrita da tarifa base.  
+✅ Aplicação isolada da taxa de chuva (+15%).  
+✅ Aplicação isolada da taxa de horário de pico (+25%).  
+✅ **Comportamento cumulativo:**
 
 ```text
-TarifaBase
-     ↓
-ChuvaDecorator
-     ↓
-PicoDecorator
-```
-
-Isso permite adicionar novas regras no futuro, como:
-
-- `FeriadoDecorator`
-- `CarnavalDecorator`
-- `DescontoDecorator`
-
-sem modificar classes existentes.
-
----
-
-## ⚙️ Princípios SOLID Aplicados
-
-### SRP — Single Responsibility Principle
-
-Cada classe possui apenas uma responsabilidade.
-
-Exemplo:
-
-- `Pedido` → armazena dados
-- `ChuvaDecorator` → aplica taxa de chuva
-- `PicoDecorator` → aplica taxa de horário de pico
-
----
-
-### OCP — Open/Closed Principle
-
-O sistema está aberto para extensão e fechado para modificação.
-
-Novas regras de preço podem ser adicionadas sem alterar o código existente.
-
----
-
-### DIP — Dependency Inversion Principle
-
-O sistema depende de abstrações (`Tarifa`) ao invés de implementações concretas.
-
----
-
-## 🧠 Padrões GRASP Aplicados
-
-### Information Expert
-
-A classe `Pedido` é responsável por armazenar informações relevantes para a precificação da corrida, como:
-
-- distância
-- condição climática
-- horário de pico
-
----
-
-### Controller
-
-A classe `PrecificacaoController` atua como ponto de entrada do sistema, orquestrando o fluxo de execução.
-
----
-
-## 🧪 Testes Automatizados
-
-O projeto utiliza **JUnit 5** para testes unitários.
-
-### Testes implementados:
-
-✅ Tarifa base  
-✅ Tarifa com chuva  
-✅ Tarifa com horário de pico  
-✅ Tarifa com chuva + pico
-
-Exemplo validado:
-
-```text
-R$20
+R$ 20,00 (Base)
 → chuva (+15%)
 → pico (+25%)
 
-Resultado: R$28,75
+Resultado validado pelas asserções: R$ 28,75
 ```
 
 ---
 
-## 📂 Estrutura do Projeto
+## 📂 Estrutura de Pacotes
+
+A arquitetura reflete a separação estrita de responsabilidades:
 
 ```text
-src
-│
-├── controller
-│   └── PrecificacaoController.java
-│
-├── model
-│   └── Pedido.java
-│
-├── decorator
-│   ├── Tarifa.java
-│   ├── TarifaBase.java
-│   ├── TarifaDecorator.java
-│   ├── ChuvaDecorator.java
-│   └── PicoDecorator.java
-│
-├── test
-│   └── TarifaTest.java
-│
-└── Main.java
+src/
+├── builder/    # Construção consistente do objeto
+├── decorator/  # Modificadores de preço dinâmicos
+├── model/      # Entidades imutáveis do domínio
+├── service/    # Controladores e log de código legado
+├── strategy/   # Cálculos base por categoria
+├── test/       # Suíte de validação TDD (JUnit)
+└── Main.java   # Ponto de entrada
 ```
-
----
-
-## 🚀 Tecnologias Utilizadas
-
-- **Java 21**
-- **JUnit 5**
-- **IntelliJ IDEA**
-- **Git & GitHub**
 
 ---
 
 ## ▶️ Como Executar
 
-### 1. Clone o repositório
+**1. Clone o repositório:**
 
 ```bash
-git clone URL_DO_REPOSITORIO
+git clone https://github.com/SEU-USUARIO/MotorPrecificacao.git
+
 ```
 
-### 2. Abra no IntelliJ IDEA
+**2. Abra a IDE:** Abra o diretório no IntelliJ IDEA ou Eclipse.
 
-Abra o projeto normalmente pelo IntelliJ.
+**3. Execute a aplicação:** Rode a classe `Main.java` para ver a orquestração do *Builder* com o *Controller*.
 
-### 3. Execute o sistema
-
-Abra:
-
-```text
-Main.java
-```
-
-e clique em:
-
-```text
-Run Main
-```
-
-### 4. Executar testes
-
-Abra:
-
-```text
-TarifaTest.java
-```
-
-e execute:
-
-```text
-Run TarifaTest
-```
+**4. Execute os testes:** Rode a classe `TarifaTest.java` para validar a suíte do JUnit.
 
 ---
 
-## 👥 Equipe
+## 👥 Desenvolvedores
 
-Projeto desenvolvido para a disciplina de **Arquitetura e Projeto de Software (APS)**.
+Projeto de **Arquitetura e Projeto de Software (APS)** - Universidade Católica de Pernambuco (UNICAP).
 
-**Integrantes do grupo:**
-
-- João Pedro
-- Maria Clara
-- Maria Luiza
-- Jhon Victor
-
----
-
-## 📖 Considerações Finais
-
-O projeto foi desenvolvido com foco na aplicação prática de conceitos de **Engenharia de Software**, demonstrando o uso de padrões arquiteturais, princípios SOLID, GRASP, testes automatizados e refatoração orientada a objetos para construção de um sistema modular e escalável.
+* João Pedro Catunda de Moraes
+* Maria Clara de Oliveira Barbosa
+* Maria Luiza Monteiro
+* Jhon Victor Ramos Martins
